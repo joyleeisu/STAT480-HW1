@@ -1,0 +1,68 @@
+---
+title: 'Stat 480 - Homework #1'
+author: "Zhaohui Li"
+date: "1/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Life Expectancy 1950 - 1990
+
+1. Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name.
+
+2. In class, we have discussed life expectancy in Canada, Mexico and the United States in the 50s and 60s. Additional data for the 70s and 80s is available in the file <a href="">gap7080.csv</a>. Use the R Markdown file with the sample solution for the test case (see the online schedule for a link) to extend our class solution and include values for the 70s and 80s, i.e. you are asked to
+    a. Visualize the life expectancy for the United States, Canada and Mexico in a line chart (with three lines in different colours).
+    b. Comment in your writeup about what you see in the plot. Make sure that the incorrect value for Canada in 1957 is fixed.
+
+Note: 
+
+1. this homework is supposed to be mainly a code reading exercise. You should not have to program extensively. Instead, you have to figure out which pieces you need to copy and adjust. 
+2. the R command for combining two datasets that have the same structure is `rbind`, used as:
+
+```
+combined <- rbind(data1, data2)
+```
+
+For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html file with it. 
+
+
+## Load library
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+## Reading the data 
+
+```{r}
+data1 <- read.csv("https://raw.githubusercontent.com/joyleeisu/STAT480-HW1/master/gapminder-5060.csv?token=AIGPU2CTGYGTO2Z26COCPRK6FCZK4v")
+data2 <- read.csv("https://raw.githubusercontent.com/joyleeisu/STAT480-HW1/master/gap7080.csv?token=AIGPU2ECLPXLQNX77CBFCDC6FCZGI")
+data <- rbind(data1, data2)
+head(data)
+```
+
+## Fix the wrong value
+
+```{r}
+data %>% filter(country == "Canada") %>% filter(year == 1957) 
+canada_fixed <- data %>% filter(country == "Canada") %>% mutate(
+  lifeExp = replace(lifeExp, year==1957, 69.96)  
+)
+
+```
+
+## Plot
+
+```{r}
+canada_fixed %>% 
+  ggplot(aes(x = year, y = lifeExp, colour=country)) + geom_line() +
+  geom_line(data = data %>% 
+              filter(country %in% c("United States", "Mexico")))
+```
+
+## Comment
+
+The graph is showing that the life expectancy of Canada, US, and Mexico are increasing over the four decades. Moreover, Mexico have the largest increasing rate in life expectancy. Besides, Canada have the highest life expectancy and Mexico have the lowest life expectancy during the decades. 
